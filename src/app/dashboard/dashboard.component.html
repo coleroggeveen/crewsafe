@@ -1,0 +1,413 @@
+<div class="min-h-screen bg-dark-900 text-white">
+  <!-- Top Header with User Profile -->
+  <header class="bg-dark-800 border-b border-dark-700 px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button 
+          (click)="toggleSidebar()" 
+          class="p-2 rounded-lg hover:bg-dark-700 transition-colors lg:hidden"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <h1 class="flex items-center gap-8 text-xl font-semibold">
+            <a routerLink="/" class="flex items-center gap-2 text-2xl font-bold text-white hover:text-primary-400 transition-colors">
+                <img src="assets\images\crewcheck-logo.png" class="hidden sm:flex w-10 h-10" alt="CrewSafe Logo">
+                <span>CrewSafe</span>
+              </a>
+              <span class="hidden md:flex">|</span>
+              <span class="hidden md:flex">{{ selectedSectionName }}</span></h1>
+      </div>
+      
+      <!-- User Profile Section -->
+      <div class="flex items-center gap-4">
+        <!-- <div class="flex lg:hidden items-center gap-3">
+          <span class="text-sm text-dark-300">{{ user.email }}</span>
+        </div> -->
+        <div class="flex items-center gap-2">
+          <button 
+            (click)="goToSettings()" 
+            class="p-2 rounded-lg hover:bg-dark-700 transition-colors"
+            title="Settings"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            </svg>
+          </button>
+          <button 
+            (click)="logout()" 
+            class="p-2 rounded-lg hover:bg-dark-700 transition-colors"
+            title="Logout"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="flex items-center gap-3">
+          <img 
+            [src]="user.avatar" 
+            [alt]="user.name"
+            class="w-10 h-10 rounded-full bg-dark-700 border-2 border-dark-600"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9IiM0QjU1N0QiLz4KPHN2ZyB4PSI4IiB5PSIxMCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIj4KPHBhdGggZD0iTTEyIDQuMzU0YTQgNCAwIDExMCA1LjI5Mk0xNSAyMUgzdi0xYTYgNiAwIDAxMTIgMHYxem0wIDBoNnYtMWE2IDYgMCAwMC05LTUuMTk3bTEzLjUtOWEyLjUgMi41IDAgMTEtNSAwIDIuNSAyLjUgMCAwMTUgMHoiLz4KPC9zdmc+Cjwvc3ZnPgo='"
+          >
+          <div class="hidden lg:block">
+            <p class="text-sm font-medium">{{ user.name }}</p>
+            <p class="text-xs text-dark-300">{{ user.email }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex w-full">
+    <!-- Sidebar Navigation -->
+    <aside 
+      [class]="'fixed sm:relative sm:flex bg-dark-800 border-r border-dark-700 transition-all duration-300 ' + (isSidebarCollapsed ? 'hidden' : 'w-screen md:w-48 lg:w-64')"
+      class="min-h-screen"
+    >
+      <nav class="p-4 w-full">
+        <ul class="space-y-2">
+          <li *ngFor="let section of sections">
+            <button
+              (click)="selectSection(section.id)"
+              [class]="'w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ' + 
+                       (selectedSection === section.id 
+                         ? 'bg-primary-600 text-white' 
+                         : 'text-dark-300 hover:bg-dark-700 hover:text-white')"
+            >
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="section.icon"></path>
+              </svg>
+              <span *ngIf="!isSidebarCollapsed" class="truncate">{{ section.name }}</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6">
+      <div [ngSwitch]="selectedSection">
+        
+        <!-- Overview Section -->
+        <div *ngSwitchCase="'overview'" class="space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-4">Welcome back, {{ user.name }}!</h2>
+            <p class="text-dark-300">Here's what's happening with your safety management today.</p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-dark-300">Active Checklists</p>
+                  <p class="text-2xl font-bold">12</p>
+                </div>
+                <div class="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-dark-300">Completed Today</p>
+                  <p class="text-2xl font-bold">8</p>
+                </div>
+                <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-dark-300">Team Members</p>
+                  <p class="text-2xl font-bold">24</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-dark-300">Safety Score</p>
+                  <p class="text-2xl font-bold">94%</p>
+                </div>
+                <div class="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+            <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3 text-sm">
+                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span class="text-dark-300">Daily safety inspection completed by John Smith</span>
+                <span class="text-dark-400 ml-auto">2 hours ago</span>
+              </div>
+              <div class="flex items-center gap-3 text-sm">
+                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span class="text-dark-300">New checklist template created</span>
+                <span class="text-dark-400 ml-auto">4 hours ago</span>
+              </div>
+              <div class="flex items-center gap-3 text-sm">
+                <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <span class="text-dark-300">Safety incident report submitted</span>
+                <span class="text-dark-400 ml-auto">6 hours ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checklists Section -->
+        <div *ngSwitchCase="'checklists'" class="space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-4">Checklists</h2>
+            <p class="text-dark-300">Manage and monitor your safety checklists.</p>
+          </div>
+          
+          <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-lg font-semibold">Active Checklists</h3>
+              <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors">
+                Create New
+              </button>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-4 bg-dark-700 rounded-lg">
+                <div>
+                  <h4 class="font-medium">Daily Safety Inspection</h4>
+                  <p class="text-sm text-dark-300">Assigned to: John Smith</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 bg-yellow-600 text-yellow-100 text-xs rounded-full">In Progress</span>
+                  <button class="p-2 hover:bg-dark-600 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between p-4 bg-dark-700 rounded-lg">
+                <div>
+                  <h4 class="font-medium">Weekly Equipment Check</h4>
+                  <p class="text-sm text-dark-300">Assigned to: Sarah Johnson</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 bg-green-600 text-green-100 text-xs rounded-full">Completed</span>
+                  <button class="p-2 hover:bg-dark-600 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Templates Section -->
+        <div *ngSwitchCase="'templates'" class="space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-4">Templates</h2>
+            <p class="text-dark-300">Create and manage checklist templates for your team.</p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700 hover:border-primary-500 transition-colors">
+              <div class="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold mb-2">Daily Safety Inspection</h3>
+              <p class="text-dark-300 text-sm mb-4">Standard daily safety checklist for construction sites</p>
+              <div class="flex items-center gap-2 text-xs text-dark-400">
+                <span>15 items</span>
+                <span>•</span>
+                <span>Used 24 times</span>
+              </div>
+            </div>
+            
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700 hover:border-primary-500 transition-colors">
+              <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold mb-2">Equipment Maintenance</h3>
+              <p class="text-dark-300 text-sm mb-4">Weekly equipment safety and maintenance checklist</p>
+              <div class="flex items-center gap-2 text-xs text-dark-400">
+                <span>8 items</span>
+                <span>•</span>
+                <span>Used 12 times</span>
+              </div>
+            </div>
+            
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700 hover:border-primary-500 transition-colors">
+              <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold mb-2">Site Security Check</h3>
+              <p class="text-dark-300 text-sm mb-4">End-of-day security and safety verification</p>
+              <div class="flex items-center gap-2 text-xs text-dark-400">
+                <span>6 items</span>
+                <span>•</span>
+                <span>Used 18 times</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div *ngSwitchCase="'reports'" class="space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-4">Reports</h2>
+            <p class="text-dark-300">Generate and view safety reports and analytics.</p>
+          </div>
+          
+          <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+            <h3 class="text-lg font-semibold mb-4">Safety Performance Overview</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div class="text-center">
+                <p class="text-3xl font-bold text-green-500">98%</p>
+                <p class="text-sm text-dark-300">Compliance Rate</p>
+              </div>
+              <div class="text-center">
+                <p class="text-3xl font-bold text-blue-500">156</p>
+                <p class="text-sm text-dark-300">Inspections This Month</p>
+              </div>
+              <div class="text-center">
+                <p class="text-3xl font-bold text-yellow-500">3</p>
+                <p class="text-sm text-dark-300">Incidents This Month</p>
+              </div>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-3 bg-dark-700 rounded-lg">
+                <span class="text-sm">Generate Monthly Report</span>
+                <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                  Generate
+                </button>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-dark-700 rounded-lg">
+                <span class="text-sm">Export Safety Data</span>
+                <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                  Export
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Section -->
+        <div *ngSwitchCase="'team'" class="space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-4">Team Management</h2>
+            <p class="text-dark-300">Manage your team members and their safety responsibilities.</p>
+          </div>
+          
+          <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-lg font-semibold">Team Members</h3>
+              <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors">
+                Add Member
+              </button>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-4 bg-dark-700 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-medium">JS</span>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">John Smith</h4>
+                    <p class="text-sm text-dark-300">Safety Supervisor</p>
+                  </div>
+                </div>
+                <span class="px-2 py-1 bg-green-600 text-green-100 text-xs rounded-full">Active</span>
+              </div>
+              
+              <div class="flex items-center justify-between p-4 bg-dark-700 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-medium">SJ</span>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">Sarah Johnson</h4>
+                    <p class="text-sm text-dark-300">Equipment Inspector</p>
+                  </div>
+                </div>
+                <span class="px-2 py-1 bg-green-600 text-green-100 text-xs rounded-full">Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div *ngSwitchCase="'settings'" class="space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold mb-4">Settings</h2>
+            <p class="text-dark-300">Configure your account and application preferences.</p>
+          </div>
+          
+          <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+            <h3 class="text-lg font-semibold mb-4">Account Settings</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium mb-2">Full Name</label>
+                <input type="text" [value]="user.name" class="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:border-primary-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Email Address</label>
+                <input type="email" [value]="user.email" class="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:border-primary-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Notifications</label>
+                <div class="flex items-center gap-4">
+                  <label class="flex items-center gap-2">
+                    <input type="checkbox" checked class="rounded border-dark-600 bg-dark-700 text-primary-600 focus:ring-primary-500">
+                    <span class="text-sm">Email notifications</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <input type="checkbox" checked class="rounded border-dark-600 bg-dark-700 text-primary-600 focus:ring-primary-500">
+                    <span class="text-sm">Push notifications</span>
+                  </label>
+                </div>
+              </div>
+              <button class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg transition-colors">
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
