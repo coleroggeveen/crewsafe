@@ -1,6 +1,6 @@
 
 export default {
-  basePath: 'https://coleroggeveen.github.io/crewsafe',
+  basePath: '/',
   supportedLocales: {
   "en-US": ""
 },
